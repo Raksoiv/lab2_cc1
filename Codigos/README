@@ -1,0 +1,5 @@
+**Consideraciones**
+Para este laboratorio se  utilizo python3
+Se considero para los algoritmos de que era posible definir
+la derivada (f_derivate(x)) y la funcion para punto fijo (g(x))
+de manera manual
