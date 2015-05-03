@@ -1,30 +1,55 @@
+#imports
+from math import sqrt
+
 #Constantes
 e_mach = 2**(-52)
-def lineal(ei, eii):
-	print("Lineal: " + str(eii / ei))
 
-def superLineal(ei, eii):
-	err = eii / (ei**((1 + sqrt(5)) / (2)))
-	print("Super Lineal: " + str(err))
+#Pregunta II
+def lineal(listOfResult):
+	listOfErrors = []
+	for i in range(0, len(listOfResult) - 1):
+		listOfErrors.append(abs(listOfResult[i] - listOfResult[i+1]))
+	for i in range(0, len(listOfErrors) - 1):
+		if(listOfErrors[i] != 0):
+			print("Lineal: " + str((float)(listOfErrors[i+1]) / listOfErrors[i]))
 
-def cuadratic(ei, eii):
-	print("Cuadratico: " + str(eii/ei**2))
+def superLineal(listOfResult):
+	listOfErrors = []
+	for i in range(0, len(listOfResult) - 1):
+		listOfErrors.append(abs(listOfResult[i] - listOfResult[i+1]))
+	for i in range(0, len(listOfErrors) - 1):
+		if(listOfErrors[i] != 0):
+			err = (float)(listOfErrors[i+1]) / ((float)(listOfErrors[i]**((1.0 + sqrt(5)) / 2.0)))
+		print("Super Lineal: " + str(err))
 
+def cuadratico(listOfResult):
+	listOfErrors = []
+	for i in range(0, len(listOfResult) - 1):
+		listOfErrors.append(abs(listOfResult[i] - listOfResult[i+1]))
+	for i in range(0, len(listOfErrors) - 1):
+		if(listOfErrors[i] != 0):
+			print("Cuadratico: " + str((float)(listOfErrors[i+1])/listOfErrors[i]**2))
+
+#Pregunta I
 def bisection(a, b, f, tol):
 	"""Metodo de la biseccion para la función f(x)
-	entre los intervalos a y b y con una tolerancia TOL"""
+	entre los intervalos a y b y con una tolerancia TOL
+	listOfResult se utiliza para la deteccion del error"""
+	listOfResult = []
 	print("Biseccion")
 	while(((b - a) / 2.0) > tol):
 		c = (a + b) / 2
+		listOfResult.append(c)
 		if(f(c) == 0):
-			print("Raiz encontrada: " + str(c))
-			return c
+			break
 		elif((f(a) * f(c)) <= 0):
 			b = c
 		else:
 			a = c
-	print("Se alcanso la tolerancia")
-	print("La raiz aproximada es: " + str(c))
+	print("La raiz es: " + str(c))
+	lineal(listOfResult)
+	superLineal(listOfResult)
+	cuadratico(listOfResult)
 	return c
 
 def secantMethod(f, x0, x1):
@@ -32,11 +57,19 @@ def secantMethod(f, x0, x1):
 	print("Secante")
 	xi = x0
 	xii = x1
-	while(f(xi) > e_mach):
-		temp = xii - ((f(xii) * (xii - xi)) / (f(xii) - f(xi)))
-		xii = xi
-		xi = temp
+	listOfResult = []
+	listOfResult.append(xi)
+	for i in range(0, limit):
+		xiii = xii - ((f(xii) * (xii - xi)) / (f(xii) - f(xi)))
+		if(((xii != 0) and (xi != 0) and (abs(xii - xi) / abs(xii) < tol)) or (abs(xii - xi) == 0)):
+			break
+		xi = xii
+		xii = xiii
+		listOfResult.append(xi)
 	print("Raiz encontrada: " + str(xi))
+	lineal(listOfResult)
+	superLineal(listOfResult)
+	cuadratico(listOfResult)
 	return xi
 
 def fixedPoint(g, x0, tol):
@@ -44,22 +77,44 @@ def fixedPoint(g, x0, tol):
 	Con una toleracia tol"""
 	print("Punto Fijo")
 	xi = x0
-	while(abs(g(xi) - xi) > tol):
-		xi = g(xi)
+	listOfResult = []
+	listOfResult.append(xi)
+	for i in range(0, limit):
+		xii = g(xi)
+		if(((xii != 0) and (xi != 0) and (abs(xii - xi) / abs(xii) < tol)) or (abs(xii - xi) == 0)):
+			break
+		xi = xii
+		listOfResult.append(xi)
 	print("Raiz encontrada: " + str(xi))
+	lineal(listOfResult)
+	superLineal(listOfResult)
+	cuadratico(listOfResult)
 	return xi
 
-def newtonMethod(f, f_prima, x0, tol):
+def newtonMethod(f, f_prima, x0, tol, limit):
 	"""Metodo de punto fijo, con la funcion de Newton
 	donde f es la funcion a la que se le busca la raiz
 	f_prima es la derivada de la funcion f y x0 el valor inicial
-	Se considera una tolerancia tol"""
+	Se considera una tolerancia tol y un limite de iteraciones lim"""
 	print("Newton")
 	xi = x0
-	while(abs(f(xi) - xi) > tol):
-		xi = xi - ((f(xi)) / (f_prima(xi)))
-	print("Raiz encontrada: " + str(xi))
-	return xi
+	listOfResult = []
+	listOfResult.append(xi)
+	for i in range(0, limit):
+		y = f(xi)
+		yp = f_prima(xi)
+		if(abs(yp) < e_mach):
+			print("division por cero")
+			break
+		xii = xi - y/yp
+		if(((xii != 0) and (xi != 0) and (abs(xii - xi) / abs(xii) < tol)) or (abs(xii - xi) == 0)):
+			break
+		xi = xii
+		listOfResult.append(xi)
+	print("raiz encontrada: " + str(xi))
+	lineal(listOfResult)
+	superLineal(listOfResult)
+	cuadratico(listOfResult)
 
 def newthonModifiedMethod(f, f_prima, x0, m, tol):
 	"""Metodo de punto fijo, con la funcion de Newton Modificado
@@ -69,17 +124,21 @@ def newthonModifiedMethod(f, f_prima, x0, m, tol):
 	Se considera una tolerancia tol"""
 	print("Newton Modificado")
 	xi = x0
-	while(abs(f(xi) - xi) > tol):
-		xi = xi - ((m * f(xi)) / (f_prima(xi)))
-	print("Raiz encontrada: " + str(xi))
+	listOfResult = []
+	listOfResult.append(xi)
+	for i in range(0, limit):
+		y = m * f(xi)
+		yp = f_prima(xi)
+		if(abs(yp) < e_mach):
+			print("division por cero")
+			break
+		xii = xi - y/yp
+		if(((xii != 0) and (xi != 0) and (abs(xii - xi) / abs(xii) < tol)) or (abs(xii - xi) == 0)):
+			break
+		xi = xii
+		listOfResult.append(xi)
+	print("raiz encontrada: " + str(xi))
+	lineal(listOfResult)
+	superLineal(listOfResult)
+	cuadratico(listOfResult)
 	return xi
-
-# Pruebas
-# f = lambda x: x**3
-# g = lambda x: -(x**3 - x)
-# f_prima = lambda x: 3 * x**2
-# bisection(-.4, .6, f, .00001)
-# secantMethod(f, .5, .1)
-# fixedPoint(g, .5, .001)
-# newtonMethod(f, f_prima, .5, .01)
-# newthonModifiedMethod(f, f_prima, .5, 3, .001)
