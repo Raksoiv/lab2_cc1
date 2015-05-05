@@ -52,7 +52,7 @@ def bisection(a, b, f, tol):
 	cuadratico(listOfResult)
 	return c
 
-def secantMethod(f, x0, x1):
+def secantMethod(f, x0, x1, limit):
 	"""Metodo de la secante para la funcion f(x) con los valores iniciales x0 y x1"""
 	print("Secante")
 	xi = x0
@@ -72,7 +72,7 @@ def secantMethod(f, x0, x1):
 	cuadratico(listOfResult)
 	return xi
 
-def fixedPoint(g, x0, tol):
+def fixedPoint(g, x0, tol, limit):
 	"""Metodo de punto fijo utlizando g(x) y punto inicial x0
 	Con una toleracia tol"""
 	print("Punto Fijo")
@@ -116,7 +116,7 @@ def newtonMethod(f, f_prima, x0, tol, limit):
 	superLineal(listOfResult)
 	cuadratico(listOfResult)
 
-def newthonModifiedMethod(f, f_prima, x0, m, tol):
+def newthonModifiedMethod(f, f_prima, x0, m, tol, limit):
 	"""Metodo de punto fijo, con la funcion de Newton Modificado
 	donde f es la funcion a la que se le busca la raiz
 	f_prima es la derivada de la funcion f y x0 el valor inicial
